@@ -1,12 +1,16 @@
 const express = require('express');
 const app = express(); // Create an instance of the Express application
 
-app.use("/", (req, res) => {
-    res.send("Hello from the dashboard");
+app.get("/user", (req, res) => {
+    res.send({firstName: "pratham", lastName: "singla"});
 });
 
-app.use("/hello", (req, res) => {
-    res.send("hello hello hello");
+app.post("/user", (req, res) => {
+    res.send("Data has been posted to the server");
+});
+
+app.delete("/user", (req, res) => {
+    res.send("Data has been deleted from the server");
 });
 
 app.use("/test", (req, res) => {

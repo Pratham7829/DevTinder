@@ -20,6 +20,34 @@ app.post("/signup", async (req, res) => {
     }
 });
 
+// find users by email
+app.get("/user", async (req, res) => {
+    const userEmail = req.body.emailId;
+    try{
+        const user = await User.findOne({emailId: userEmail});
+        if(user) {
+            res.send(user);
+        } else {
+            res.status(404).send("User not found");
+        }
+    } catch(err) {
+        console.error("Error finding user:", err);
+        res.status(400).send("Error finding the user" + err.message);
+    }
+
+});
+
+// Feed API - get all the users from the database
+app.get("/feed", async (req, res) => {
+    try{
+        const users = await User.find({});
+        res.send(users);
+    } catch(err) {
+        console.error("Error finding users:", err);
+        res.status(400).send("Error finding the users" + err.message);
+    }
+});
+
 // we should do app.listen after we habe connected to the database
 connectDB()
     .then(() => {

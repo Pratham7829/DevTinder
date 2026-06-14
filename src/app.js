@@ -2,11 +2,13 @@ const express = require('express');
 const app = express(); // Create an instance of the Express application
 const {adminAuth} = require("./middlewares/auth");
 
-app.get("/admin/getAllData", adminAuth, (req, res) => {
+app.use("/admin", adminAuth); // Apply the adminAuth middleware to all routes starting with /admin
+
+app.get("/admin/getAllData", (req, res) => {
     res.send("Data sent!!!");
 });
 
-app.get("/admin/deleteData", adminAuth, (req, res) => {
+app.get("/admin/deleteData", (req, res) => {
     res.send("Data deleted!!!");
 });
 

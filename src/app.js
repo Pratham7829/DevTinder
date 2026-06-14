@@ -1,17 +1,29 @@
 const express = require('express');
+const { connectDB } = require('./config/database');
+const {User} = require('./models/user');
 const app = express(); // Create an instance of the Express application
-const {adminAuth} = require("./middlewares/auth");
 
-app.use("/admin", adminAuth); // Apply the adminAuth middleware to all routes starting with /admin
+app.post("/signup", async (req, res) => {
 
-app.get("/admin/getAllData", (req, res) => {
-    res.send("Data sent!!!");
+    // creating an new instance of the User model
+    const user = new User({
+        firstName: "Pratham",
+        lastName: "Singla",
+        emailId: "pratham.singla@example.com",
+        password: "password123",
+    });
+    await user.save();
+    res.send("user Added successfully");
 });
 
-app.get("/admin/deleteData", (req, res) => {
-    res.send("Data deleted!!!");
-});
-
-app.listen(3000, () => {
-    console.log("Server is successfully listening on port 3000");
-});
+// we should do app.listen after we habe connected to the database
+connectDB()
+    .then(() => {
+        console.log("Database connected successfully");
+        app.listen(3000, () => {
+            console.log("Server is successfully listening on port 3000");
+        });
+    })
+    .catch((err) => {
+        console.error("Database connection failed:", err);
+    });

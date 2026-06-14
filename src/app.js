@@ -48,6 +48,38 @@ app.get("/feed", async (req, res) => {
     }
 });
 
+// delete user by id
+app.delete("/user", async (req, res) => {
+    const userId = req.body.userId;
+    try{
+        const user = await User.findByIdAndDelete(userId);
+        console.log(user);
+        if(user) {
+            res.send("User deleted successfully");
+        } else {
+            res.status(404).send("User not found");
+        }
+    } catch(err) {
+        console.error("Error deleting user:", err);
+        res.status(400).send("Error deleting the user" + err.message);
+    }
+});
+
+// update data of user
+app.patch("/user", async (req, res) => {
+    const userId = req.body.userId;
+    const data = req.body;
+    try{
+        const user = await User.findByIdAndUpdate(userId, data, {returnDocument: "before"});
+        console.log(user);
+        res.send("User updated successfully");
+    }catch(err) {
+        console.error("Error updating user:", err);
+        res.status(400).send("Error updating the user" + err.message);
+    }
+});
+
+
 // we should do app.listen after we habe connected to the database
 connectDB()
     .then(() => {

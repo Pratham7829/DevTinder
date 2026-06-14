@@ -1,17 +1,13 @@
 const express = require('express');
 const app = express(); // Create an instance of the Express application
+const {adminAuth} = require("./middlewares/auth");
 
-app.use("/user", [(req, res, next) => {
-    console.log("First route handler");
-    next();
-    // res.send("Hello from the first route handler!");
-}, (req, res, next) => {
-    console.log("Second route handler");
-    // res.send("Hello from the /user route!");
-    next();
-}], (req, res, next) => {
-    console.log("Third route handler");
-    res.send("Hello from the third route handler!");
+app.get("/admin/getAllData", adminAuth, (req, res) => {
+    res.send("Data sent!!!");
+});
+
+app.get("/admin/deleteData", adminAuth, (req, res) => {
+    res.send("Data deleted!!!");
 });
 
 app.listen(3000, () => {

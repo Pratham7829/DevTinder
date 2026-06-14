@@ -1,4 +1,4 @@
-export const adminAuth = (req, res, next) => {
+const adminAuth = (req, res, next) => {
     const token = "xyz";
     const authorizedToken = "xyz";
 
@@ -8,3 +8,5 @@ export const adminAuth = (req, res, next) => {
         res.status(401).send("Unauthorized");
     }
 };
+
+module.exports = {adminAuth};

@@ -4,8 +4,11 @@ const {User} = require('./models/user');
 const app = express(); // Create an instance of the Express application
 const {validateSignUpData} = require("./utils/validation"); // Import the validation function
 const bcrypt = require("bcrypt"); // Import bcrypt for password hashing
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 app.use(express.json()); // Middleware to parse JSON request bodies
+app.use(cookieParser()); // Request me aayi cookies ko req.cookies object me convert karta hai.
 
 app.post("/signup", async (req, res) => {
     try{
@@ -37,7 +40,15 @@ app.post("/login", async (req, res) => {
             throw new Error("Invalid Credentials!!!");
         } else{
             const isPasswordValid = await bcrypt.compare(password, user.password);
+
             if(isPasswordValid){
+                // create a JWT token
+                const token = await jwt.sign({_id: user._id}, "DEV@Tinder$790");
+                // console.log(token);
+
+                // Add the token to cookie and send the response back to the user
+                res.cookie("token", token);
+
                 res.send("LogIn Successfull!!!");
             } else{
                 // throw new Error("Password is not correct");
@@ -45,6 +56,33 @@ app.post("/login", async (req, res) => {
             }
         }
 
+    } catch(err){
+        res.status(400).send("ERROR: " + err.message);
+    }
+});
+
+app.get("/profile", async (req, res) => {
+    try{
+        const cookies = req.cookies;
+
+        const {token} = cookies;
+        if(!token){
+            throw new Error("Invalid Token!!!");
+        }
+        // validate my token
+
+        const decodedMessage = await jwt.verify(token, "DEV@Tinder$790");
+        // console.log(decodedMessage);
+        const {_id} = decodedMessage;
+        // console.log("logged in user is: " + _id);
+
+        const user = await User.findById(_id);
+        if(!user){
+            throw new Error("User does not exist!!!");
+        }
+
+        // console.log(cookies);
+        res.send(user);
     } catch(err){
         res.status(400).send("ERROR: " + err.message);
     }

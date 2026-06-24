@@ -10,6 +10,7 @@ const {userAuth} = require("./middlewares/auth");
 const {authRouter} = require("./routes/auth");
 const {profileRouter} = require("./routes/profile");
 const {requestRouter} = require("./routes/request");
+const {userRouter} = require("./routes/user");
 
 app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(cookieParser()); // Request me aayi cookies ko req.cookies object me convert karta hai.
@@ -17,6 +18,7 @@ app.use(cookieParser()); // Request me aayi cookies ko req.cookies object me con
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
+app.use("/", userRouter);
 
 // we should do app.listen after we have connected to the database
 connectDB()

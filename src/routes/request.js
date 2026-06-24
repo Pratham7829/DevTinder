@@ -1,11 +1,59 @@
 const express = require("express");
 const requestRouter = express.Router();
 const {userAuth} = require("../middlewares/auth");
+const {ConnectionRequest} = require("../models/connectionRequest");
+const {User} = require("../models/user");
 
-requestRouter.post("/sendConnectionRequest", userAuth, async (req, res) => {
-    const user = req.user;
-    console.log("Sending a connection request");
-    res.send(user.firstName + " is sending the connection request");
+// for interested or ignored status
+requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res) => {
+    try{
+        const fromUserId = req.user; // person who is sending the connection request
+        const toUserId = req.params.toUserId;
+        const status = req.params.status;
+
+        const allowedStatus = ["ignored", "interested"];
+        if(!allowedStatus.includes(status)){
+            return res.status(400).json({
+                message: "Invalid Status Type!!!" + status
+            });
+        }
+
+        const toUser = await User.findById(toUserId);
+        if(!toUser){
+            return res.status(404).json({
+                message: "User not found!!!"
+            });
+        }
+
+        // If there is a existing connection request
+        const existingConnectionRequest = await ConnectionRequest.findOne({
+            $or: [
+                {fromUserId: fromUserId, toUserId: toUserId},
+                {fromUserId: toUserId, toUserId: fromUserId}
+            ]
+        });
+
+        if(existingConnectionRequest) {
+            return res.status(400).json({
+                message: "Connection Request Already Exists!!!"
+            });
+        }
+
+        const connectionRequest = new ConnectionRequest({
+            fromUserId,
+            toUserId,
+            status
+        });
+        const data = await connectionRequest.save();
+
+        res.json({
+            message: req.user.firstName + " is " + status + " " + toUser.firstName,
+            data
+        });
+
+    } catch(err) {
+        res.status(400).send("ERROR: " + err.message);
+    }
 });
 
 module.exports = {requestRouter};

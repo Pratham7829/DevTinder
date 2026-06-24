@@ -19,6 +19,9 @@ const connectionRequestSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
+// compound index
+connectionRequestSchema.index({fromUserId: 1, toUserId: 1});
+
 // whenever we are writing a schema method or a pre function, try to avoid arrow function
 // below this is a method which will be called every time a connectionRequest is saved
 connectionRequestSchema.pre("save", function () {
